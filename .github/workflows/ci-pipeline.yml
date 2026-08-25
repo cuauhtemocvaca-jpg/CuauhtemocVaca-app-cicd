@@ -1,0 +1,42 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Instalar herramientas
+        run: |
+          npm install --no-save eslint
+          npm install --no-save html-validate
+          npm install --no-save stylelint stylelint-config-standard
+
+      - name: Ejecutar ESLint
+        run: npx eslint script.js
+
+      - name: Validar HTML
+        run: npx html-validate index.html
+
+      - name: Validar CSS
+        run: npx stylelint style.css --config '{"extends":["stylelint-config-standard"]}'
+
+      - name: Ejecutar prueba
+        run: |
+          test -f index.html
+          grep -q "<title>" index.html
